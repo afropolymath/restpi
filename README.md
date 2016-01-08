@@ -10,7 +10,7 @@ To use the library you need to install it on your Raspberry Pi. Ensure that Pyth
 pip install iotcontrol
 ```
 ## Usage
-The default use case of the library is via the command line using the barest minimum settings, making all your GPio pins accessible remotely. **This is not recommended and should not be used except for when being used in sandbox mode**. To activate the IOTControl server in this mode, simply run:
+The default use case of the library is via the command line using the barest minimum settings, making all your GPio pins accessible remotely. **This is not recommended and should not be used except for when being used in sandbox mode**. To activate the REST-Pi server in this mode, simply run:
 ```
 restpi serve <PORT_NUMBER>
 ```
