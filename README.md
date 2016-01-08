@@ -1,8 +1,8 @@
-# IOTControl
+# REST-Pi
 Nifty Library written in Python for controlling Raspberry Pi based devices remotely.
 
 ## Requirements
-[ngrok](https://ngrok.com/) is required to enable IOTControl create a publicly accessible URL for your device.
+[ngrok](https://ngrok.com/) is required to enable REST-Pi create a publicly accessible URL for your device.
 
 ## Installation
 To use the library you need to install it on your Raspberry Pi. Ensure that Python is installed on your Pi (recommended version is > 2.7.10). The libary is available on [PyPi](https://pypi.python.org/pypi), the Python Package Index and is installable via the `pip` command. Simply run:
@@ -12,7 +12,7 @@ pip install iotcontrol
 ## Usage
 The default use case of the library is via the command line using the barest minimum settings, making all your GPio pins accessible remotely. **This is not recommended and should not be used except for when being used in sandbox mode**. To activate the IOTControl server in this mode, simply run:
 ```
-iotcontrol serve <PORT_NUMBER>
+restpi serve <PORT_NUMBER>
 ```
 - `PORT_NUMBER` - The port via which you want to allow remote accesses to your device.
 
@@ -26,7 +26,7 @@ The default API structure looks like this
 
 | EndPoint  | Method | Description |
 | ------------- | ------------- | ------------- |
-| `/pins`  | GET  | Get full list of all the available pins and their statuses |
-| `/pins`  | POST  | Update multiple pins at a time based on the signature in the JSON data passed |
-| `/pins/:pin_id`  | GET  | Get pin status of pin with id `pin_id` |
-| `/pins/:pin_id/:status`  | GET  | Update the status of pin with id `pin_id`. The status can either be 0 or 1 corresponding to OFF or ON |
+| `/channels`  | GET  | Get full list of all the available pins and their statuses |
+| `/channels`  | POST  | Update multiple pins at a time based on the signature in the JSON data passed |
+| `/channels/:channel_id`  | GET  | Get pin status of pin with id `channel_id` |
+| `/channels/:channel_id/:status`  | GET  | Update the status of pin with id `channel_id`. The status can either be 0 or 1 corresponding to OFF or ON |
