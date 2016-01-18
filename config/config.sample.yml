@@ -1,0 +1,10 @@
+mode: BOARD
+mapping:
+  input:
+    - 1
+    - 2
+    - 3
+  output:
+    - 4
+    - 5
+    - 6
