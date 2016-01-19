@@ -30,4 +30,7 @@ class RestServer(object):
         return self.app
 
     def run(self, *args, **kwargs):
+        """
+        Wrapper for the Flask app run method
+        """
         self.app.run(*args, **kwargs)

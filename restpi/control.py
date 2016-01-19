@@ -7,6 +7,9 @@ gpio = None
 class Channels(object):
     @staticmethod
     def initialize(api, config_file):
+        """
+        Initialize the API based on the config parameters
+        """
         gpio = GpioControl(config_file)
         api.add_resource(ChannelListView, '/channels')
         api.add_resource(ChannelDetailView, '/channels/<int:channel_id>')
@@ -14,11 +17,15 @@ class Channels(object):
 
 class ChannelListView(Resource):
     def get(self):
-        # Returns a list of all the channels and their configuration
+        """
+        Returns a list of all the channels and their configuration
+        """
         return gpio.config['mapping']
 
     def post(self):
-        # Adds a new channel configuration or replaces one that already exists
+        """
+        Adds a new channel configuration or replaces one that already exists
+        """
         try:
             channel_id = request.form['channel_id']
             mode = request.form['mode']
@@ -35,6 +42,9 @@ class ChannelListView(Resource):
 
 class ChannleDetailView(Resource):
     def get(self, channel_id):
+        """
+        Gets the channel status
+        """
         if channel_id not in gpio.config['mapping'][mode]:
             raise BadRequest("The channel_id URL parameter is invalid")
 
@@ -52,7 +62,9 @@ class ChannleDetailView(Resource):
         return res
 
     def post(self, channel_id):
-        # Updates channel status based on request
+        """
+        Updates channel status based on request
+        """
         try:
             pin_status = int(request.form['pin_status'])
             if pin_status not in [0, 1]:
@@ -130,9 +142,15 @@ class GpioControl(object):
         return False
 
     def set_mode(self, channel_id, mode):
+        """
+        Set the mode of a channel to the specified mode
+        """
         rpi_mode = GPIO.OUT if mode == 'output' else GPIO.IN
         GPIO.setup(channel_id, rpi_mode)
         return True
 
     def end(self):
+        """
+        End the GPIO interaction session
+        """
         GPIO.cleanup()
