@@ -8,26 +8,17 @@ import yaml
 # TODO: Ensure requests are non blocking and don't result in deadlocks
 # logger.warning('Protocol problem: %s', 'connection reset', extra=d)
 
-try:
-    import RPi.GPIO as GPIO
-except RuntimeError:
-    print "Error importing RPi.GPIO!  This is probably because you need " \
-        "superuser privileges.  You can achieve this by using 'sudo' to run " \
-        "your script"
-
 class RestServer(object):
     """
     Manages the server status and information. It also creates an instance of
     the Flask server used through out the application.
     """
-    def __init__(self, module, config_file):
+    def __init__(self, module, config):
         self.app = Flask(module)
         api = Api(app)
 
         # Create Flask application with default endpoints
-        Channels.initialize(api, config_file)
-
-        return self.app
+        Channels.initialize(api, config)
 
     def run(self, *args, **kwargs):
         """

@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+
+from restpi import RestServer
+import argparse, subprocess
+
+def parse_configurations(config_file):
+    """
+    Parse configuration details from yml file and also ensure that the file is
+    well formatted
+    """
+    config = None
+    with open(config_file) as stream:
+        config = yaml.load(stream)
+
+    # Do some double checking of the format
+    return config
+
+if __name__ == '__main__':
+    # Setup default arguments for the command line interface
+    parser = argparse.ArgumentParser(description='Start IOTControl Server')
+    parser.add_argument("action", help="Specify the action you want to perform", type=str, choices=['serve'], required=True)
+    parser.add_argument('-p', '--port', help='Specify the port for the server being created. Accessible locally', default=8080, required=True)
+    parser.add_argument('-c', '--config', help='Specify configuration information for the server being initialized', required=True)
+
+    args = parser.parse_args()
+
+    if args.config:
+        try:
+            config = parse_configurations(args.config)
+
+            if args.action == 'serve':
+                server = RestServer(__name__, config)
+                server.run(port=args.port)
+
+                subprocess.call('ngrok http ' + args.port)
+
+            if args.action == 'secureserve':
+                pass
+
+        except Error:
+            print "There was an error while trying to read the configuration file"

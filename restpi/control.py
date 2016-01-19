@@ -4,13 +4,20 @@ from werkzeug.exceptions import BadRequest, InternalServerError
 
 gpio = None
 
+try:
+    import RPi.GPIO as GPIO
+except RuntimeError:
+    print "Error importing RPi.GPIO!  This is probably because you need " \
+        "superuser privileges.  You can achieve this by using 'sudo' to run " \
+        "your script"
+
 class Channels(object):
     @staticmethod
-    def initialize(api, config_file):
+    def initialize(api, config):
         """
         Initialize the API based on the config parameters
         """
-        gpio = GpioControl(config_file)
+        gpio = GpioControl(config)
         api.add_resource(ChannelListView, '/channels')
         api.add_resource(ChannelDetailView, '/channels/<int:channel_id>')
         return api
@@ -38,6 +45,8 @@ class ChannelListView(Resource):
                 raise BadRequest("The channel_id parameter is invalid")
 
             gpio.set_mode(channel_id, mode)
+        except:
+            raise BadRequest("Error while parsing the channel_id parameters")
 
 
 class ChannleDetailView(Resource):
@@ -87,36 +96,29 @@ class GpioControl(object):
     Creates an object that abstracts away the logic of controlling the Pi using
     simpler and more elegant syntax.
     """
-    def __init__(self, config_file):
+    def __init__(self, config):
         try:
-            self.config = self.setup(config_file)
+            self.config = self.setup(config)
         except Error:
             print "There was an error while trying to initialize GPIO"
 
-    def setup(self, config_file):
+    def setup(self, config):
         """
         Setup the board using the specified configuration parameters
         """
-        config = None
-        try:
-            with open(config_file) as stream:
-                config = yaml.load(stream)
+        # Set board pin mapping mode from config
+        GPIO.setmode(config['mode'])
 
-            # Set board pin mapping mode from config
-            GPIO.setmode(config['mode'])
+        if 'mapping' in config:
+            # Setup GPIO Input channels
+            for i in config['mapping']['input']:
+                GPIO.setup(channel, GPIO.IN)
 
-            if 'mapping' in config:
-                # Setup GPIO Input channels
-                for i in config['mapping']['input']:
-                    GPIO.setup(channel, GPIO.IN)
+            # Setup GPIO Output channels
+            for i in config['mapping']['output']:
+                GPIO.setup(channel, GPIO.OUT)
 
-                # Setup GPIO Output channels
-                for i in config['mapping']['output']:
-                    GPIO.setup(channel, GPIO.OUT)
-
-            return config
-        except Error:
-            raise "Could not parse the configuration file"
+        return config
 
     def write(self, channel, data):
         """
