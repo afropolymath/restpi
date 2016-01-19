@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from iotcontrol import IOTServer
+from restpi import RestServer
 import argparse
 
 if __name__ == '__main__':
@@ -11,6 +11,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    server = IOTServer(__name__, args.config)
+    server = RestServer(__name__, args.config)
 
-    server.app.run(port=args.port)
+    server.run(port=args.port)
