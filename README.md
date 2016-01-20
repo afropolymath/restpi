@@ -6,13 +6,13 @@ Nifty Library written in Python for controlling Raspberry Pi based devices remot
 
 ### Installation
 To use the library you need to install it on your Raspberry Pi. Ensure that Python is installed on your Pi (recommended version is > 2.7.10). The library is available on [PyPi](https://pypi.python.org/pypi), the Python Package Index and is installable via the `pip` command. Simply run:
-```
-pip install iotcontrol
+```sh
+$ pip install iotcontrol
 ```
 ### Usage
 To activate the REST-Pi server, simply run:
-```
-restpi serve --config=<PATH_TO_CONFIG_FILE> --port=<PORT_NUMBER>
+```sh
+$ restpi serve --config=<PATH_TO_CONFIG_FILE> --port=<PORT_NUMBER>
 ```
 - `PORT_NUMBER` - The port via which you want to allow remote accesses to your device.
 - `PATH_TO_CONFIG_FILE` - The path to the config file that will be used to setup the board.
