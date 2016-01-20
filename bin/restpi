@@ -3,6 +3,8 @@
 from restpi import RestServer
 import argparse, subprocess
 
+import yaml
+
 def parse_configurations(config_file):
     """
     Parse configuration details from yml file and also ensure that the file is
@@ -12,11 +14,15 @@ def parse_configurations(config_file):
     with open(config_file) as stream:
         config = yaml.load(stream)
 
-    # Do some double checking of the format
+    if 'mapping' not in config or 'mode' not in config:
+        raise ValueError
+
+    if 'input' not in config['mapping'] or 'output' not in config['mapping']:
+        raise ValueError
+
     return config
 
 if __name__ == '__main__':
-    # Setup default arguments for the command line interface
     parser = argparse.ArgumentParser(description='Start IOTControl Server')
     parser.add_argument("action", help="Specify the action you want to perform", type=str, choices=['serve'], required=True)
     parser.add_argument('-p', '--port', help='Specify the port for the server being created. Accessible locally', default=8080, required=True)

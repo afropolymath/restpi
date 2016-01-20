@@ -1,8 +1,5 @@
 from flask import Flask
-from flask_restful import Resource
-from control import GpioControl, Channels
-
-import yaml
+from channel import ChannelControl
 
 # TODO: Setup logging on the library and exception handling
 # TODO: Ensure requests are non blocking and don't result in deadlocks
@@ -16,9 +13,7 @@ class RestServer(object):
     def __init__(self, module, config):
         self.app = Flask(module)
         api = Api(app)
-
-        # Create Flask application with default endpoints
-        Channels.initialize(api, config)
+        ChannelControl.initialize(api, config)
 
     def run(self, *args, **kwargs):
         """
