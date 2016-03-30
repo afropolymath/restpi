@@ -5,16 +5,18 @@ from werkzeug.exceptions import BadRequest, InternalServerError
 
 gpio = None
 
+
 class ChannelControl(object):
     @staticmethod
     def initialize(api, config):
         """
         Initialize the API based on the config parameters
         """
-        gpio = GpioControl(config)
+        gpio = GpioControl.setup(config)
         api.add_resource(ChannelListView, '/channels')
         api.add_resource(ChannelDetailView, '/channels/<int:channel_id>')
         return api
+
 
 class ChannelListView(Resource):
     def get(self):
@@ -54,8 +56,9 @@ class ChannleDetailView(Resource):
         pin_status = gpio.read(channel_id)
 
         if pin_status is False:
-            raise InternalServerError("Error occurred while trying to read" \
-                "channel data")
+            raise InternalServerError(
+                "Error occurred while trying to read channel data"
+            )
 
         res = {
             "channel_id": channel_id,
@@ -74,7 +77,9 @@ class ChannleDetailView(Resource):
                 raise BadRequest("The pin_status parameter is invalid")
 
             if not gpio.write(channel_id, pin_status):
-                raise InternalServerError("The write process was not successful")
+                raise InternalServerError(
+                    "The write process was not successful"
+                )
 
             res = {
                 "channel_id": channel_id,

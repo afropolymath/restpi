@@ -4,19 +4,18 @@ except RuntimeError:
     print "Error importing RPi.GPIO!  This is probably because you need " \
         "superuser privileges.  You can achieve this by using 'sudo' to run " \
         "your script"
-        
+
+
 class GpioControl(object):
     """
     Creates an object that abstracts away the logic of controlling the Pi using
     simpler and more elegant syntax.
     """
     def __init__(self, config):
-        try:
-            self.config = self.setup(config)
-        except Error:
-            print "There was an error while trying to initialize GPIO"
+        self.config = config
 
-    def setup(self, config):
+    @staticmethod
+    def setup(config):
         """
         Setup the board using the specified configuration parameters
         """
@@ -26,10 +25,11 @@ class GpioControl(object):
             for i in config['mapping']['input']:
                 GPIO.setup(channel, GPIO.IN)
 
-            for i in config['mapping']['output']:
+            for i in config['mapping']['output'] and
+            i not in config['mapping']['input']:
                 GPIO.setup(channel, GPIO.OUT)
 
-        return config
+        return GpioControl(config)
 
     def write(self, channel, data):
         """
