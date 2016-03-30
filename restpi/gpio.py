@@ -22,12 +22,8 @@ class GpioControl(object):
         GPIO.setmode(config['mode'])
 
         if 'mapping' in config:
-            for i in config['mapping']['input']:
+            for channel in config['mapping']['input']:
                 GPIO.setup(channel, GPIO.IN)
-
-            for i in config['mapping']['output'] and
-            i not in config['mapping']['input']:
-                GPIO.setup(channel, GPIO.OUT)
 
         return GpioControl(config)
 
