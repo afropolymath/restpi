@@ -12,7 +12,9 @@ setup(
     install_requires=[
         'flask',
         'flask_restful',
-        'RPi.GPIO'
+        'RPi.GPIO',
+        'docopt',
+        'PyYAML'
     ],
     test_suite='nose.collector',
     tests_require=['nose'],

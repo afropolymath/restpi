@@ -12,13 +12,14 @@ class RestServer(object):
     Manages the server status and information. It also creates an instance of
     the Flask server used through out the application.
     """
-    def __init__(self, module, config):
-        self.app = Flask(module)
-        self.api = Api(app)
+    def __init__(self, config):
+        self.app = Flask(__name__)
+        self.api = Api(self.app)
         self.api = ChannelControl.initialize(self.api, config)
 
     def run(self, *args, **kwargs):
         """
         Wrapper for the Flask app run method
         """
+        print "Now running REST-Pi Server..."
         self.app.run(*args, **kwargs)

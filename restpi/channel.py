@@ -3,16 +3,16 @@ from flask_restful import Resource
 from gpio import GpioControl
 from werkzeug.exceptions import BadRequest, InternalServerError
 
-gpio = None
-
 
 class ChannelControl(object):
-    @staticmethod
-    def initialize(api, config):
+    gpio_obj = None
+
+    @classmethod
+    def initialize(cls, api, config):
         """
         Initialize the API based on the config parameters
         """
-        gpio = GpioControl.setup(config)
+        cls.gpio_obj = GpioControl.setup(config)
         api.add_resource(ChannelListView, '/channels')
         api.add_resource(ChannelDetailView, '/channels/<int:channel_id>')
         return api
@@ -23,7 +23,7 @@ class ChannelListView(Resource):
         """
         Returns a list of all the channels and their configuration
         """
-        return gpio.config['mapping']
+        return ChannelControl.gpio_obj.config['mapping']
 
     def post(self):
         """
@@ -37,23 +37,26 @@ class ChannelListView(Resource):
                 raise BadRequest("The mode parameter is invalid")
 
             channel_id = int(channel_id)
-            if channel_id not in gpio.config['mapping'][mode]:
+            if channel_id not in ChannelControl.gpio_obj.config['mapping'][mode]:
                 raise BadRequest("The channel_id parameter is invalid")
 
-            gpio.set_mode(channel_id, mode)
+            ChannelControl.gpio_obj.set_mode(channel_id, mode)
         except:
             raise BadRequest("Error while parsing the channel_id parameters")
 
 
-class ChannleDetailView(Resource):
+class ChannelDetailView(Resource):
     def get(self, channel_id):
         """
         Gets the channel status
         """
-        if channel_id not in gpio.config['mapping'][mode]:
-            raise BadRequest("The channel_id URL parameter is invalid")
-
-        pin_status = gpio.read(channel_id)
+        try:
+            channel_id = int(channel_id)
+        except Exception:
+            raise InternalServerError(
+                "Invalid channel_id parameter"
+            )
+        pin_status = ChannelControl.gpio_obj.read(channel_id)
 
         if pin_status is False:
             raise InternalServerError(
@@ -72,11 +75,11 @@ class ChannleDetailView(Resource):
         Updates channel status based on request
         """
         try:
-            pin_status = int(request.form['pin_status'])
+            pin_status = int(request.json['pin_status'])
             if pin_status not in [0, 1]:
                 raise BadRequest("The pin_status parameter is invalid")
 
-            if not gpio.write(channel_id, pin_status):
+            if not ChannelControl.gpio_obj.write(channel_id, pin_status):
                 raise InternalServerError(
                     "The write process was not successful"
                 )

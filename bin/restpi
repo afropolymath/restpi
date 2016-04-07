@@ -1,9 +1,27 @@
 #!/usr/bin/env python
 
+"""REST-Pi.
+
+Usage:
+  sample.py (serve|secureserve) --config=FILE [--port=PORT]
+  sample.py (-h | --help)
+  sample.py --version
+
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+
+"""
+
+from docopt import docopt
 from restpi import RestServer
-import argparse
 import subprocess
+import platform
+import signal
+import ngrok
 import yaml
+import sys
+import os
 
 
 def parse_configurations(config_file):
@@ -24,43 +42,68 @@ def parse_configurations(config_file):
     return config
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Start IOTControl Server')
-    parser.add_argument(
-            "action",
-            help="Specify the action you want to perform",
-            type=str, choices=['serve'], required=True
-        )
-    parser.add_argument(
-            '-p',
-            '--port',
-            help='Specify the port for the server being created. \
-                Accessible locally',
-            default=8080,
-            required=True
-        )
-    parser.add_argument(
-            '-c',
-            '--config',
-            help='Specify configuration information for the server being \
-                initialized',
-            required=True
-        )
+    # check to make sure a program exists
+    print "Checking for ngrok on system"
 
-    args = parser.parse_args()
+    cmd = "where" if platform.system() == "Windows" else "which"
+    try:
+        subprocess.call([cmd, 'ngrok'])
+    except:
+        print "No executable"
+        sys.exit(0)
 
-    if args.config:
+    print "ngrok exists."
+
+    def start_ngrok(on_port):
+        return subprocess.call([
+            'bin/ngrok_control',
+            'start',
+            '{}'.format(str(on_port))
+        ])
+
+    def stop_ngrok():
+        return subprocess.call([
+            'bin/ngrok_control',
+            'stop'
+        ])
+
+    def signal_handler(signal, frame):
         try:
-            config = parse_configurations(args.config)
+            p = stop_ngrok()
+        except subprocess.CalledProcessError as e:
+            print e.output
+        sys.exit(0)
 
-            if args.action == 'serve':
-                server = RestServer(__name__, config)
-                server.run(port=args.port)
+    signal.signal(signal.SIGINT, signal_handler)
 
-                subprocess.call('ngrok http ' + args.port)
+    args = docopt(__doc__, version='REST-Pi 1.0')
 
-            if args.action == 'secureserve':
+    if args['--config']:
+        try:
+            config = parse_configurations(args['--config'])
+
+            if args['serve']:
+                server = RestServer(config)
+                port_number = args['--port'] or 7000
+
+                # Start ngrok
+                p = start_ngrok(port_number)
+                tunnels = ngrok.client.get_tunnels()
+                http_tunnel = tunnels[1]
+                print "Your public API is located at {}".format(
+                    http_tunnel.public_url
+                )
+                server.run(port=port_number, debug=True)
+
+            if args['secureserve']:
                 pass
 
-        except Error:
+        except ValueError:
             print "There was an error while trying to read the \
                 configuration file"
+
+        except (subprocess.CalledProcessError, Exception) as e:
+            stop_ngrok()
+            print "Quiting program"
+    else:
+        print "You need to specify a valid configuration file"

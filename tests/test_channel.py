@@ -1,9 +1,10 @@
 import unittest
-from flask_restful import Api
+from restpi import RestServer
 
 
 class TestChannel(unittest.TestCase):
     def setup(self):
+        self.restserver= RestServer
         self.api = Api(Flask(__name__))
         self.config = {
             'mode': 'BOARD',

@@ -5,7 +5,6 @@ except RuntimeError:
         "superuser privileges.  You can achieve this by using 'sudo' to run " \
         "your script"
 
-
 class GpioControl(object):
     """
     Creates an object that abstracts away the logic of controlling the Pi using
@@ -24,7 +23,10 @@ class GpioControl(object):
         if 'mapping' in config:
             for channel in config['mapping']['input']:
                 GPIO.setup(channel, GPIO.IN)
+            for channel in config['mapping']['output']:
+                GPIO.setup(channel, GPIO.OUT)
 
+        print GPIO.mapping
         return GpioControl(config)
 
     def write(self, channel, data):
@@ -35,7 +37,7 @@ class GpioControl(object):
             try:
                 GPIO.output(channel, data)
                 return True
-            except Error:
+            except Exception:
                 return False
         return False
 
@@ -43,10 +45,10 @@ class GpioControl(object):
         """
         Read bit from a channel
         """
-        if channel in config['mapping']['input']:
+        if channel in self.config['mapping']['input']:
             try:
                 return GPIO.input(channel)
-            except Error:
+            except Exception:
                 return False
         return False
 

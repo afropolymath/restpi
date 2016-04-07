@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ $1 == 'start' ]; then
+  ngrok http $2 > /dev/null &
+  echo 'Waiting for ngrok to run...'
+  sleep 10
+fi
+
+if [ $1 == 'stop' ]; then
+  pkill -9 ngrok
+  echo 'Killing ngrok server...'
+  echo 'Exiting'
+fi
