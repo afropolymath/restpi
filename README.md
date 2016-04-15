@@ -57,7 +57,7 @@ mapping:
     - 6
 ```
 
-The main configuration parameters to take not of are the `mode` and the `mapping`.
+The main configuration parameters to take note of are the `mode` and the `mapping`.
 
 The `mode` parameter can be one of `BOARD` or `BCM` corresponding to the pin mapping mode we would like to make use of. See here for information on this.
 
